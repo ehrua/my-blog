@@ -6,43 +6,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* 기본 설정 */
 body {
   background: black;
   color: #e0e0e0;
   font-family: "Malgun Gothic", sans-serif;
   margin: 0;
-  transition: background 1s;
+  transition: background 1s, color 1s;
 }
 
-/* 컨테이너 */
 .container {
   max-width: 700px;
   margin: 0 auto;
-  padding: 60px 20px 120px;
+  padding: 60px 20px 160px;
 }
 
-/* 제목 */
 h1 {
   text-align: center;
   font-weight: normal;
   margin-bottom: 50px;
 }
 
-/* 규칙 박스 */
 .rule {
   border-left: 2px solid #333;
   padding-left: 14px;
   margin-bottom: 28px;
+  white-space: pre-line;
   opacity: 0;
   transition: opacity 1s;
 }
 
-.rule.show {
-  opacity: 1;
-}
+.rule.show { opacity: 1; }
 
-/* 버튼 */
 .next-btn {
   display: block;
   margin: 40px auto;
@@ -53,11 +47,7 @@ h1 {
   cursor: pointer;
 }
 
-.next-btn:hover {
-  background: #222;
-}
-
-/* 뒤로가기 버튼 */
+/* 뒤로가기 */
 #backBtn {
   position: fixed;
   top: 12px;
@@ -73,7 +63,6 @@ h1 {
   z-index: 999;
 }
 
-/* 경고 텍스트 */
 #warning {
   position: fixed;
   top: 60px;
@@ -82,13 +71,44 @@ h1 {
   color: #b00000;
   font-size: 14px;
   display: none;
+  z-index: 999;
+}
+
+/* HOME */
+.home-btn {
+  display: none;
+  margin: 12px auto;
+  padding: 10px;
+  width: 120px;
+  text-align: center;
+  border: 1px solid #333;
+  background: #111;
+  color: #aaa;
+  cursor: pointer;
+}
+
+/* 엔딩 */
+#ending {
+  display: none;
+  text-align: center;
+  margin-top: 80px;
+}
+
+#ending h2 {
+  font-weight: normal;
+  margin-bottom: 20px;
+}
+
+.countdown {
+  color: #b00000;
+  font-size: 18px;
+  margin-top: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 뒤로가기 버튼 -->
 <button id="backBtn">←</button>
 <div id="warning"></div>
 
@@ -97,28 +117,66 @@ h1 {
 
   <div id="rules"></div>
 
+  <div id="homeArea">
+    <div class="home-btn">HOME</div>
+    <div class="home-btn">HOME</div>
+    <div class="home-btn">HOME</div>
+  </div>
+
   <button class="next-btn" id="nextRuleBtn">규칙 확인</button>
+
+  <div id="ending">
+    <h2 id="endingTitle"></h2>
+    <p id="endingText"></p>
+    <div class="countdown" id="countdown"></div>
+  </div>
 </div>
 
 <script>
-/* 규칙 목록 */
+/* ===== 상태 ===== */
+let violated = false;
+let index = 0;
+let homeCount = 0;
+let timerStarted = false;
+let deathTimer = null;
+
+/* ===== 규칙 ===== */
 const rules = [
-  "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
-  "2. 이 블로그에 접속한 사실을 링크로 공유하지 마십시오.",
-  "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.",
-  "4. 글 중간에 광고나 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.",
-  "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
-  "6. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
-  "7. 규칙 중 '어딘가를 응시하십시오'라는 문장은 존재하지 않습니다. 뒤로 가기를 누르십시오.",
-  "8. 이 항목을 읽고 있다면, 당신은 잘 이행하고 있는 것입니다."
+`1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.`,
+
+`2. 이 블로그에 접속한 사실을
+링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.`,
+
+`3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.
+특히 눈 부분이 먼저 또렷해질 경우 즉시 시선을 내리십시오.`,
+
+`4. 글 중간에 광고, 오류 메시지, 또는 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.
+그 화면은 광고가 아닙니다.`,
+
+`5. 만약 화면이 빨간색으로 변한다면,
+당신이 있는 곳에서 오른쪽 방향으로 고개를 돌리십시오.
+확인하려 하지 마십시오.`,
+
+`6. 저주에서 벗어나고 싶다면 3명에게 이 블로그의 링크를 공유하십시오.
+단, 이 규칙은 실행 여부와 상관없이 기록됩니다.`,
+
+`7. 위 규칙 중에는
+“어딘가를 응시하십시오” 와 같은 문장은 존재하지 않습니다.
+그러므로 지금 즉시 뒤로 가기 버튼을 누르십시오.`,
+
+`8. 항목이 수정되었습니다.
+블로그에는 문맥이 맞지 않는 규칙이 섞여 있을 수 있습니다.
+아래의 홈 버튼을 3번 누르십시오.`,
+
+`9. 어떤 소리가 들리더라도 반응하지 말고 무시하십시오.
+이 블로그는 소리를 재생하지 않습니다.`
 ];
 
-let index = 0;
-
-/* 규칙 추가 */
 const rulesContainer = document.getElementById("rules");
 const nextBtn = document.getElementById("nextRuleBtn");
+const homeBtns = document.querySelectorAll(".home-btn");
 
+/* ===== 규칙 진행 ===== */
 nextBtn.addEventListener("click", () => {
   if (index >= rules.length) return;
 
@@ -126,7 +184,6 @@ nextBtn.addEventListener("click", () => {
   div.className = "rule";
   div.textContent = rules[index];
   rulesContainer.appendChild(div);
-
   setTimeout(() => div.classList.add("show"), 50);
 
   triggerEffect(index);
@@ -134,46 +191,101 @@ nextBtn.addEventListener("click", () => {
 
   if (index === rules.length) {
     nextBtn.style.display = "none";
+    // 모든 규칙을 끝까지 읽었는데 위반이 없다면 탈출 체크
+    setTimeout(checkEscape, 1000);
   }
 });
 
-/* 이상 현상 */
+/* ===== 이상 현상 ===== */
 function triggerEffect(i) {
   if (i === 4) {
     document.body.style.background = "#400";
-    setTimeout(() => document.body.style.background = "black", 1200);
+    setTimeout(() => document.body.style.background = "black", 1500);
   }
-
   if (i === 6) {
-    document.body.style.background = "black";
-    document.body.style.color = "#aaa";
-  }
-
-  if (i === 7) {
-    document.body.style.background = "black";
     document.body.style.color = "#b00000";
+  }
+  if (i === 7) {
+    homeBtns.forEach(btn => btn.style.display = "block");
+  }
+  if (i === 8) {
+    playSound();
   }
 }
 
-/* 뒤로가기 버튼 처리 */
-const backBtn = document.getElementById("backBtn");
-const warning = document.getElementById("warning");
-let backCount = 0;
+/* ===== HOME 버튼 ===== */
+homeBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    homeCount++;
+    if (homeCount >= 3 && !violated) {
+      showEscapeEnding();
+    }
+  });
+});
 
-backBtn.addEventListener("click", () => {
+/* ===== 뒤로가기 (위반) ===== */
+let backCount = 0;
+const warning = document.getElementById("warning");
+document.getElementById("backBtn").addEventListener("click", () => {
   backCount++;
+  violated = true;
   warning.style.display = "block";
-  warning.textContent = "규칙을 위반하였습니다.";
+  warning.textContent = "규칙 위반이 기록되었습니다.";
 
   document.body.style.background = "#200";
-  setTimeout(() => {
-    document.body.style.background = "black";
-  }, 400);
+  setTimeout(() => document.body.style.background = "black", 400);
 
-  if (backCount >= 2) {
-    warning.textContent = "이미 너무 늦었습니다.";
-  }
+  startDeathTimer();
 });
+
+/* ===== 엔딩 판정 ===== */
+function checkEscape() {
+  if (!violated && homeCount >= 3) {
+    showEscapeEnding();
+  } else if (violated) {
+    startDeathTimer();
+  }
+}
+
+function showEscapeEnding() {
+  clearInterval(deathTimer);
+  document.getElementById("ending").style.display = "block";
+  document.getElementById("endingTitle").textContent = "당신은 저주에서 해방되었습니다.";
+  document.getElementById("endingText").textContent =
+    "규칙을 어기지 않았습니다. 이 페이지를 닫아도 됩니다.";
+  document.getElementById("countdown").textContent = "";
+}
+
+/* ===== 저주 엔딩 (3일 이내 사망 연출) ===== */
+function startDeathTimer() {
+  if (timerStarted) return;
+  timerStarted = true;
+
+  document.getElementById("ending").style.display = "block";
+  document.getElementById("endingTitle").textContent = "저주가 기록되었습니다.";
+  document.getElementById("endingText").textContent =
+    "당신은 3일 이내에 사망합니다.";
+
+  let time = 60; // 연출용 카운트다운(초) — 늘리고 싶으면 숫자만 변경
+  const cd = document.getElementById("countdown");
+  cd.textContent = `남은 시간: ${time}초`;
+
+  deathTimer = setInterval(() => {
+    time--;
+    cd.textContent = `남은 시간: ${time}초`;
+    if (time <= 0) {
+      clearInterval(deathTimer);
+      cd.textContent = "시간이 종료되었습니다.";
+    }
+  }, 1000);
+}
+
+/* ===== 소리 (모순 연출) ===== */
+function playSound() {
+  const audio = new Audio("https://www.soundjay.com/misc/sounds/ghostly-whisper-1.mp3");
+  audio.volume = 0.2;
+  audio.play();
+}
 </script>
 
 </body>
