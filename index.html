@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>저의 블로그</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* 기본 설정 */
+body {
+  background: black;
+  color: #e0e0e0;
+  font-family: "Malgun Gothic", sans-serif;
+  margin: 0;
+  transition: background 1s;
+}
+
+/* 컨테이너 */
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 60px 20px 120px;
+}
+
+/* 제목 */
+h1 {
+  text-align: center;
+  font-weight: normal;
+  margin-bottom: 50px;
+}
+
+/* 규칙 박스 */
+.rule {
+  border-left: 2px solid #333;
+  padding-left: 14px;
+  margin-bottom: 28px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.rule.show {
+  opacity: 1;
+}
+
+/* 버튼 */
+.next-btn {
+  display: block;
+  margin: 40px auto;
+  padding: 8px 20px;
+  background: #111;
+  color: #aaa;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.next-btn:hover {
+  background: #222;
+}
+
+/* 뒤로가기 버튼 */
+#backBtn {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #111;
+  color: #aaa;
+  border: 1px solid #333;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+/* 경고 텍스트 */
+#warning {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #b00000;
+  font-size: 14px;
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 뒤로가기 버튼 -->
+<button id="backBtn">←</button>
+<div id="warning"></div>
+
+<div class="container">
+  <h1>저의 블로그에 오신 것을 환영합니다</h1>
+
+  <div id="rules"></div>
+
+  <button class="next-btn" id="nextRuleBtn">규칙 확인</button>
+</div>
+
+<script>
+/* 규칙 목록 */
+const rules = [
+  "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
+  "2. 이 블로그에 접속한 사실을 링크로 공유하지 마십시오.",
+  "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.",
+  "4. 글 중간에 광고나 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.",
+  "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
+  "6. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
+  "7. 규칙 중 '어딘가를 응시하십시오'라는 문장은 존재하지 않습니다. 뒤로 가기를 누르십시오.",
+  "8. 이 항목을 읽고 있다면, 당신은 잘 이행하고 있는 것입니다."
+];
+
+let index = 0;
+
+/* 규칙 추가 */
+const rulesContainer = document.getElementById("rules");
+const nextBtn = document.getElementById("nextRuleBtn");
+
+nextBtn.addEventListener("click", () => {
+  if (index >= rules.length) return;
+
+  const div = document.createElement("div");
+  div.className = "rule";
+  div.textContent = rules[index];
+  rulesContainer.appendChild(div);
+
+  setTimeout(() => div.classList.add("show"), 50);
+
+  triggerEffect(index);
+  index++;
+
+  if (index === rules.length) {
+    nextBtn.style.display = "none";
+  }
+});
+
+/* 이상 현상 */
+function triggerEffect(i) {
+  if (i === 4) {
+    document.body.style.background = "#400";
+    setTimeout(() => document.body.style.background = "black", 1200);
+  }
+
+  if (i === 6) {
+    document.body.style.background = "black";
+    document.body.style.color = "#aaa";
+  }
+
+  if (i === 7) {
+    document.body.style.background = "black";
+    document.body.style.color = "#b00000";
+  }
+}
+
+/* 뒤로가기 버튼 처리 */
+const backBtn = document.getElementById("backBtn");
+const warning = document.getElementById("warning");
+let backCount = 0;
+
+backBtn.addEventListener("click", () => {
+  backCount++;
+  warning.style.display = "block";
+  warning.textContent = "규칙을 위반하였습니다.";
+
+  document.body.style.background = "#200";
+  setTimeout(() => {
+    document.body.style.background = "black";
+  }, 400);
+
+  if (backCount >= 2) {
+    warning.textContent = "이미 너무 늦었습니다.";
+  }
+});
+</script>
+
+</body>
+</html>
