@@ -1,82 +1,99 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>판태현 블로그</title>
 
 <style>
-  body {
-    margin: 0;
-    background: #000;
-    color: #e0e0e0;
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    line-height: 1.7;
-  }
+body {
+  margin: 0;
+  background: black;
+  color: #ddd;
+  font-family: "Malgun Gothic", sans-serif;
+  overflow-x: hidden;
+}
 
-  .container {
-    max-width: 720px;
-    margin: auto;
-    padding: 60px 20px 120px;
-  }
+.container {
+  max-width: 720px;
+  margin: auto;
+  padding: 60px 20px 140px;
+}
 
-  h1 {
-    text-align: center;
-    margin-bottom: 40px;
-  }
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
 
-  .rule {
-    display: none;
-    margin-bottom: 40px;
-    border-left: 2px solid #444;
-    padding-left: 15px;
-  }
+.rule {
+  display: none;
+  margin-bottom: 40px;
+  border-left: 3px solid #444;
+  padding-left: 15px;
+}
 
-  .rule.active {
-    display: block;
-  }
+.rule.active {
+  display: block;
+}
 
-  .btn {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 8px 16px;
-    background: none;
-    border: 1px solid #666;
-    color: #fff;
-    cursor: pointer;
-  }
+.btn {
+  margin-top: 20px;
+  padding: 8px 16px;
+  border: 1px solid #666;
+  background: none;
+  color: white;
+  cursor: pointer;
+}
 
-  .btn:hover {
-    background: #222;
-  }
+.btn:hover {
+  background: #222;
+}
 
-  /* 하단 네비게이션 */
-  .nav {
-    position: fixed;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 40px;
-    opacity: 0.9;
-  }
+/* 하단 버튼 */
+.nav {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 40px;
+}
 
-  .nav button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-  }
+.nav button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
 
-  .hidden {
-    display: none;
-  }
+/* 사망 화면 */
+#death {
+  text-align: center;
+  font-size: 24px;
+  color: red;
+}
 
-  /* 공포 효과 */
-  .red {
-    background: #600;
-  }
+/* 귀신 이미지 */
+.ghost {
+  position: fixed;
+  width: 200px;
+  height: auto;
+  z-index: 9999;
+}
+
+/* 가짜 광고 */
+.fake-ad {
+  border: 1px solid #555;
+  padding: 15px;
+  margin-top: 20px;
+  cursor: pointer;
+  background: #111;
+}
+
+.fake-ad:hover {
+  background: #222;
+}
 </style>
 </head>
 
@@ -84,133 +101,118 @@
 
 <!-- 오디오 -->
 <audio id="bgm" loop>
-  <source src="sound/bgm.mp3" type="audio/mpeg">
+  <source src="sound/bgm.mp3">
 </audio>
 
 <audio id="scream">
-  <source src="sound/scream.mp3" type="audio/mpeg">
+  <source src="sound/scream.mp3">
+</audio>
+
+<audio id="deathSound">
+  <source src="sound/death.mp3">
 </audio>
 
 <div class="container">
-  <h1>판태현 블로그</h1>
+<h1>판태현 블로그</h1>
 
-  <!-- 규칙들 -->
-  <div class="rule active">
-    <p>이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>이 블로그에 접속한 사실을 링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.<br>
-    특히 눈 부분이 먼저 또렷해질 경우 즉시 시선을 내리십시오.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>광고, 오류 메시지, 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.<br>
-    그 화면은 광고가 아닙니다.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>화면이 빨간색으로 변한다면 오른쪽으로 고개를 돌리십시오.<br>
-    확인하려 하지 마십시오.</p>
-    <button class="btn" onclick="redEffect(); nextRule();">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>저주에서 벗어나고 싶다면 3명에게 이 블로그의 링크를 공유하십시오.<br>
-    이 행위는 기록됩니다.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>위 규칙 중 “어딘가를 응시하십시오”라는 문장은 존재하지 않습니다.<br>
-    그러므로 뒤로 가기 버튼을 누르십시오.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>항목이 수정되었습니다.<br>
-    아래 홈 버튼을 눌러 주십시오.</p>
-    <button class="btn" onclick="nextRule()">확인</button>
-  </div>
-
-  <div class="rule">
-    <p>어떤 소리가 들리더라도 반응하지 말고 무시하십시오.<br>
-    이 블로그는 소리를 재생하지 않습니다.</p>
-    <button class="btn" onclick="playScream(); endingDeath();">확인</button>
-  </div>
-
-  <!-- 엔딩 -->
-  <div class="rule" id="escape">
-    <h2>당신은 저주에서 해방되었습니다.</h2>
-  </div>
-
-  <div class="rule" id="death">
-    <h2>당신은 3일 이내에 사망합니다.</h2>
-  </div>
+<div class="rule active">
+<p>1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.</p>
+<button class="btn" onclick="nextRule()">확인</button>
 </div>
 
-<!-- 하단 버튼 -->
+<div class="rule">
+<p>2. 이 블로그에 접속한 사실을 링크, 공유, 캡처 형태로 남기지 마십시오.</p>
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.</p>
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>4. 광고나 오류 화면이 나타나도 새로 고침하지 마십시오.</p>
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>5. 화면이 붉게 변하면 고개를 돌리십시오.</p>
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>6. 저주를 피하려면 이 페이지를 공유하십시오.</p>
+
+<div class="fake-ad" onclick="die()">
+🔗 친구에게 공유하기 (권장)
+</div>
+
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>7. 위 항목 중 일부는 존재하지 않습니다.</p>
+<button class="btn" onclick="nextRule()">확인</button>
+</div>
+
+<div class="rule">
+<p>8. 어떤 소리가 들리더라도 반응하지 마십시오.<br>
+이 블로그는 소리를 재생하지 않습니다.</p>
+<button class="btn" onclick="playScream(); die()">확인</button>
+</div>
+
+<!-- 사망 엔딩 -->
+<div class="rule" id="death">
+<p>당신은 <strong>3일 이내에 사망합니다.</strong></p>
+</div>
+</div>
+
 <div class="nav">
-  <button onclick="goBack()">←</button>
-  <button onclick="goHome()">⌂</button>
+<button onclick="die()">←</button>
+<button onclick="die()">⌂</button>
 </div>
 
 <script>
-  const rules = document.querySelectorAll(".rule");
-  let current = 0;
+const rules = document.querySelectorAll(".rule");
+let index = 0;
 
-  const bgm = document.getElementById("bgm");
-  const scream = document.getElementById("scream");
+const bgm = document.getElementById("bgm");
+const scream = document.getElementById("scream");
+const deathSound = document.getElementById("deathSound");
 
-  // 첫 클릭 시 BGM 시작
-  document.addEventListener("click", () => {
-    bgm.volume = 0.35;
-    bgm.play().catch(()=>{});
-  }, { once: true });
+document.addEventListener("click", () => {
+  bgm.volume = 0.35;
+  bgm.play().catch(()=>{});
+}, { once:true });
 
-  function nextRule() {
-    rules[current].classList.remove("active");
-    current++;
-    if (rules[current]) {
-      rules[current].classList.add("active");
-    } else {
-      document.getElementById("escape").classList.add("active");
-    }
+function nextRule() {
+  rules[index].classList.remove("active");
+  index++;
+  if (rules[index]) rules[index].classList.add("active");
+}
+
+function playScream() {
+  scream.play();
+}
+
+function die() {
+  rules.forEach(r => r.classList.remove("active"));
+  document.getElementById("death").classList.add("active");
+  deathSound.play();
+
+  setTimeout(spawnGhosts, 1000);
+}
+
+function spawnGhosts() {
+  for (let i = 0; i < 25; i++) {
+    const img = document.createElement("img");
+    img.src = "img/ghost.png";
+    img.className = "ghost";
+    img.style.top = Math.random() * 100 + "vh";
+    img.style.left = Math.random() * 100 + "vw";
+    document.body.appendChild(img);
   }
-
-  function goBack() {
-    endingDeath();
-  }
-
-  function goHome() {
-    endingDeath();
-  }
-
-  function playScream() {
-    scream.currentTime = 0;
-    scream.volume = 1;
-    scream.play();
-  }
-
-  function redEffect() {
-    document.body.classList.add("red");
-    setTimeout(() => {
-      document.body.classList.remove("red");
-    }, 800);
-  }
-
-  function endingDeath() {
-    document.querySelectorAll(".rule").forEach(r => r.classList.remove("active"));
-    document.getElementById("death").classList.add("active");
-  }
+}
 </script>
 
 </body>
