@@ -1,208 +1,216 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>판태현 블로그</title>
 
 <style>
-body {
-  margin: 0;
-  background: #000;
-  color: #e0e0e0;
-  font-family: "Malgun Gothic", sans-serif;
-}
+  body {
+    margin: 0;
+    background: #000;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.7;
+  }
 
-.container {
-  max-width: 720px;
-  margin: auto;
-  padding: 40px 20px 120px;
-}
+  .container {
+    max-width: 720px;
+    margin: auto;
+    padding: 60px 20px 120px;
+  }
 
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: 40px;
+  }
 
-#ruleBox {
-  border: 1px solid #222;
-  padding: 25px;
-  min-height: 180px;
-  white-space: pre-line;
-}
+  .rule {
+    display: none;
+    margin-bottom: 40px;
+    border-left: 2px solid #444;
+    padding-left: 15px;
+  }
 
-button {
-  background: #111;
-  color: #aaa;
-  border: 1px solid #333;
-  padding: 10px 18px;
-  margin-top: 20px;
-}
+  .rule.active {
+    display: block;
+  }
 
-button:active {
-  background: #400;
-  color: #fff;
-}
+  .btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #666;
+    color: #fff;
+    cursor: pointer;
+  }
 
-/* 하단 버튼 바 */
-.bottom-bar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 56px;
-  background: #050505;
-  border-top: 1px solid #222;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 40px;
-}
+  .btn:hover {
+    background: #222;
+  }
 
-.bottom-bar button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 22px;
-}
+  /* 하단 네비게이션 */
+  .nav {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 40px;
+    opacity: 0.9;
+  }
 
-/* 빨간 화면 연출 */
-.flash {
-  background: darkred !important;
-}
+  .nav button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* 공포 효과 */
+  .red {
+    background: #600;
+  }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>판태현 블로그</h1>
-
-  <div id="ruleBox">
-사이트에 접속하셨습니다.
-
-규칙을 하나씩 확인하십시오.
-확인하지 않으면 나갈 수 없습니다.
-  </div>
-
-  <button id="checkBtn">규칙 확인</button>
-</div>
-
-<!-- 하단 버튼 -->
-<div class="bottom-bar">
-  <!-- 뒤로가기 -->
-  <button id="backBtn" aria-label="뒤로가기">←</button>
-
-  <!-- 홈 (흰색 집모양 SVG) -->
-  <button id="homeBtn" aria-label="홈">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-         xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 10.5L12 3L21 10.5V21H14V15H10V21H3V10.5Z"
-            stroke="white"
-            stroke-width="1.6"
-            stroke-linejoin="round"/>
-    </svg>
-  </button>
-</div>
-
-<!-- 오디오 (여기에 소리 파일 연결됨) -->
-<audio id="bgm" preload="auto">
+<!-- 오디오 -->
+<audio id="bgm" loop>
   <source src="sound/bgm.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="scream" preload="auto">
+<audio id="scream">
   <source src="sound/scream.mp3" type="audio/mpeg">
 </audio>
 
+<div class="container">
+  <h1>판태현 블로그</h1>
+
+  <!-- 규칙들 -->
+  <div class="rule active">
+    <p>이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>이 블로그에 접속한 사실을 링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.<br>
+    특히 눈 부분이 먼저 또렷해질 경우 즉시 시선을 내리십시오.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>광고, 오류 메시지, 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.<br>
+    그 화면은 광고가 아닙니다.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>화면이 빨간색으로 변한다면 오른쪽으로 고개를 돌리십시오.<br>
+    확인하려 하지 마십시오.</p>
+    <button class="btn" onclick="redEffect(); nextRule();">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>저주에서 벗어나고 싶다면 3명에게 이 블로그의 링크를 공유하십시오.<br>
+    이 행위는 기록됩니다.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>위 규칙 중 “어딘가를 응시하십시오”라는 문장은 존재하지 않습니다.<br>
+    그러므로 뒤로 가기 버튼을 누르십시오.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>항목이 수정되었습니다.<br>
+    아래 홈 버튼을 눌러 주십시오.</p>
+    <button class="btn" onclick="nextRule()">확인</button>
+  </div>
+
+  <div class="rule">
+    <p>어떤 소리가 들리더라도 반응하지 말고 무시하십시오.<br>
+    이 블로그는 소리를 재생하지 않습니다.</p>
+    <button class="btn" onclick="playScream(); endingDeath();">확인</button>
+  </div>
+
+  <!-- 엔딩 -->
+  <div class="rule" id="escape">
+    <h2>당신은 저주에서 해방되었습니다.</h2>
+  </div>
+
+  <div class="rule" id="death">
+    <h2>당신은 3일 이내에 사망합니다.</h2>
+  </div>
+</div>
+
+<!-- 하단 버튼 -->
+<div class="nav">
+  <button onclick="goBack()">←</button>
+  <button onclick="goHome()">⌂</button>
+</div>
+
 <script>
-/* 규칙 목록 */
-const rules = [
-  "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
+  const rules = document.querySelectorAll(".rule");
+  let current = 0;
 
-  "2. 이 블로그에 접속한 사실을\n링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.",
+  const bgm = document.getElementById("bgm");
+  const scream = document.getElementById("scream");
 
-  "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.\n특히 눈 부분이 먼저 또렷해질 경우 즉시 시선을 내리십시오.",
-
-  "4. 광고, 오류 메시지, 빈 화면이 나타나더라도\n절대 새로 고침을 하지 마십시오.\n그 화면은 광고가 아닙니다.",
-
-  "5. 화면이 빨간색으로 변할 경우,\n오른쪽으로 고개를 돌리십시오.\n확인하려 하지 마십시오.",
-
-  "6. 저주에서 벗어나고 싶다면\n3명에게 이 블로그의 링크를 공유하십시오.\n이 기록은 삭제되지 않습니다.",
-
-  "7. 위 규칙 중에는\n“어딘가를 응시하십시오”라는 문장은 존재하지 않습니다.\n그러므로 지금 즉시 뒤로 가기 버튼을 누르십시오.",
-
-  "8. 규칙은 수정될 수 있습니다.\n아래의 홈 버튼을 누르십시오.",
-
-  "9. 어떤 소리가 들리더라도\n절대 반응하지 마십시오.\n이 블로그는 소리를 재생하지 않습니다."
-];
-
-let index = 0;
-let bgmStarted = false;
-let screamPlayed = false;
-
-const ruleBox = document.getElementById("ruleBox");
-const btn = document.getElementById("checkBtn");
-const bgm = document.getElementById("bgm");
-const scream = document.getElementById("scream");
-
-/* BGM 끝나면 다시 재생 */
-bgm.addEventListener("ended", () => {
-  setTimeout(() => {
-    bgm.currentTime = 0;
-    bgm.play().catch(()=>{});
-  }, 500);
-});
-
-/* 규칙 확인 */
-btn.addEventListener("click", () => {
-
-  /* 첫 클릭에서 BGM 재생 */
-  if (!bgmStarted) {
+  // 첫 클릭 시 BGM 시작
+  document.addEventListener("click", () => {
     bgm.volume = 0.35;
     bgm.play().catch(()=>{});
-    bgmStarted = true;
+  }, { once: true });
+
+  function nextRule() {
+    rules[current].classList.remove("active");
+    current++;
+    if (rules[current]) {
+      rules[current].classList.add("active");
+    } else {
+      document.getElementById("escape").classList.add("active");
+    }
   }
 
-  ruleBox.innerText = rules[index];
+  function goBack() {
+    endingDeath();
+  }
 
-  /* 5번 연출 */
-  if (index === 4) {
-    document.body.classList.add("flash");
+  function goHome() {
+    endingDeath();
+  }
+
+  function playScream() {
+    scream.currentTime = 0;
+    scream.volume = 1;
+    scream.play();
+  }
+
+  function redEffect() {
+    document.body.classList.add("red");
     setTimeout(() => {
-      document.body.classList.remove("flash");
-    }, 400);
+      document.body.classList.remove("red");
+    }, 800);
   }
 
-  /* 9번 비명 (1회) */
-  if (index === 8 && !screamPlayed) {
-    screamPlayed = true;
-    setTimeout(() => {
-      scream.volume = 0.7;
-      scream.currentTime = 0;
-      scream.play().catch(()=>{});
-    }, 1200);
+  function endingDeath() {
+    document.querySelectorAll(".rule").forEach(r => r.classList.remove("active"));
+    document.getElementById("death").classList.add("active");
   }
-
-  index++;
-
-  if (index >= rules.length) {
-    btn.innerText = "탈출 시도";
-    btn.onclick = () => {
-      ruleBox.innerText =
-        "모든 규칙을 확인했습니다.\n\n하지만 탈출에 성공했는지는\n아직 알 수 없습니다.";
-      btn.style.display = "none";
-    };
-  }
-});
-
-/* 뒤로가기 버튼 */
-document.getElementById("backBtn").addEventListener("click", () => {
-  alert("규칙 위반이 기록되었습니다.");
-});
-
-/* 홈 버튼 */
-document.getElementById("homeBtn").addEventListener("click", () => {
-  alert("홈으로 돌아갈 수 없습니다.");
-});
 </script>
 
 </body>
