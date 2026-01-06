@@ -14,7 +14,7 @@ body {
 }
 
 .container {
-  max-width: 700px;
+  max-width: 720px;
   margin: auto;
   padding: 40px 20px 120px;
 }
@@ -28,6 +28,7 @@ h1 {
   border: 1px solid #222;
   padding: 25px;
   min-height: 180px;
+  white-space: pre-line;
 }
 
 button {
@@ -39,11 +40,11 @@ button {
 }
 
 button:active {
-  background: #300;
+  background: #400;
   color: #fff;
 }
 
-/* 하단 버튼 */
+/* 하단 홈 버튼 */
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -60,6 +61,7 @@ button:active {
   font-size: 22px;
   background: none;
   border: none;
+  color: #aaa;
 }
 
 /* 이상 현상 */
@@ -75,8 +77,10 @@ button:active {
   <h1>판태현 블로그</h1>
 
   <div id="ruleBox">
-    사이트에 접속하셨습니다.<br><br>
-    규칙을 확인하지 않으면 나갈 수 없습니다.
+사이트에 접속하셨습니다.
+
+규칙을 하나씩 확인하십시오.
+확인하지 않으면 나갈 수 없습니다.
   </div>
 
   <button id="checkBtn">규칙 확인</button>
@@ -87,22 +91,28 @@ button:active {
 </div>
 
 <!-- 오디오 -->
-<audio id="bgm" src="sound/bgm.mp3" loop></audio>
-<audio id="scream" src="sound/scream.mp3"></audio>
+<audio id="bgm" preload="auto">
+  <source src="sound/bgm.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="scream" preload="auto">
+  <source src="sound/scream.mp3" type="audio/mpeg">
+</audio>
 
 <script>
+/* 규칙 목록 */
 const rules = [
   "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
 
-  "2. 이 블로그에 접속한 사실을 링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.",
+  "2. 이 블로그에 접속한 사실을\n링크, 공유, 캡처, 인용 형태로 외부에 남기지 마십시오.",
 
   "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.\n특히 눈 부분이 먼저 또렷해질 경우 즉시 시선을 내리십시오.",
 
-  "4. 글 중간에 광고, 오류 메시지, 또는 빈 화면이 나타나더라도 새로 고침을 하지 마십시오.\n그 화면은 광고가 아닙니다.",
+  "4. 광고, 오류 메시지, 빈 화면이 나타나더라도\n절대 새로 고침을 하지 마십시오.\n그 화면은 광고가 아닙니다.",
 
   "5. 화면이 빨간색으로 변할 경우,\n오른쪽으로 고개를 돌리십시오.\n확인하려 하지 마십시오.",
 
-  "6. 저주에서 벗어나고 싶다면 3명에게 이 블로그의 링크를 공유하십시오.\n이 기록은 삭제되지 않습니다.",
+  "6. 저주에서 벗어나고 싶다면\n3명에게 이 블로그의 링크를 공유하십시오.\n이 기록은 삭제되지 않습니다.",
 
   "7. 위 규칙 중에는\n“어딘가를 응시하십시오”라는 문장은 존재하지 않습니다.\n그러므로 지금 즉시 뒤로 가기 버튼을 누르십시오.",
 
@@ -113,33 +123,48 @@ const rules = [
 
 let index = 0;
 let bgmStarted = false;
+let screamPlayed = false;
 
 const ruleBox = document.getElementById("ruleBox");
 const btn = document.getElementById("checkBtn");
 const bgm = document.getElementById("bgm");
 const scream = document.getElementById("scream");
 
-/* 첫 상호작용 시 BGM 시작 (브라우저 정책 대응) */
+/* BGM 끝나면 다시 재생 (대체 방식) */
+bgm.addEventListener("ended", () => {
+  setTimeout(() => {
+    bgm.currentTime = 0;
+    bgm.play().catch(()=>{});
+  }, 500);
+});
+
+/* 규칙 확인 버튼 */
 btn.addEventListener("click", () => {
+
+  /* 🔊 BGM 최초 재생 (브라우저 대응) */
   if (!bgmStarted) {
-    bgm.volume = 0.3;
+    bgm.volume = 0.35;
     bgm.play().catch(()=>{});
     bgmStarted = true;
   }
 
+  /* 규칙 표시 */
   ruleBox.innerText = rules[index];
 
-  /* 연출 */
+  /* 이상 현상 연출 */
   if (index === 4) {
     document.body.classList.add("flash");
-    setTimeout(()=> {
+    setTimeout(() => {
       document.body.classList.remove("flash");
     }, 400);
   }
 
-  if (index === 8) {
+  /* 9번 규칙 → 비명 1회 */
+  if (index === 8 && !screamPlayed) {
+    screamPlayed = true;
     setTimeout(() => {
-      scream.volume = 0.6;
+      scream.volume = 0.7;
+      scream.currentTime = 0;
       scream.play().catch(()=>{});
     }, 1200);
   }
@@ -150,7 +175,7 @@ btn.addEventListener("click", () => {
     btn.innerText = "탈출 시도";
     btn.onclick = () => {
       ruleBox.innerText =
-        "당신은 규칙을 끝까지 확인했습니다.\n\n하지만 이것이 탈출을 의미하지는 않습니다.";
+        "모든 규칙을 확인했습니다.\n\n하지만 규칙을 읽는 것과\n지키는 것은 다릅니다.";
       btn.style.display = "none";
     };
   }
