@@ -44,27 +44,28 @@ button:active {
   color: #fff;
 }
 
-/* 하단 홈 버튼 */
+/* 하단 버튼 바 */
 .bottom-bar {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 60px;
+  height: 56px;
   background: #050505;
   border-top: 1px solid #222;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 0 40px;
 }
 
 .bottom-bar button {
-  font-size: 22px;
   background: none;
   border: none;
-  color: #aaa;
+  color: #fff;
+  font-size: 22px;
 }
 
-/* 이상 현상 */
+/* 빨간 화면 연출 */
 .flash {
   background: darkred !important;
 }
@@ -86,11 +87,24 @@ button:active {
   <button id="checkBtn">규칙 확인</button>
 </div>
 
+<!-- 하단 버튼 -->
 <div class="bottom-bar">
-  <button id="homeBtn">🏠</button>
+  <!-- 뒤로가기 -->
+  <button id="backBtn" aria-label="뒤로가기">←</button>
+
+  <!-- 홈 (흰색 집모양 SVG) -->
+  <button id="homeBtn" aria-label="홈">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 10.5L12 3L21 10.5V21H14V15H10V21H3V10.5Z"
+            stroke="white"
+            stroke-width="1.6"
+            stroke-linejoin="round"/>
+    </svg>
+  </button>
 </div>
 
-<!-- 오디오 -->
+<!-- 오디오 (여기에 소리 파일 연결됨) -->
 <audio id="bgm" preload="auto">
   <source src="sound/bgm.mp3" type="audio/mpeg">
 </audio>
@@ -130,7 +144,7 @@ const btn = document.getElementById("checkBtn");
 const bgm = document.getElementById("bgm");
 const scream = document.getElementById("scream");
 
-/* BGM 끝나면 다시 재생 (대체 방식) */
+/* BGM 끝나면 다시 재생 */
 bgm.addEventListener("ended", () => {
   setTimeout(() => {
     bgm.currentTime = 0;
@@ -138,20 +152,19 @@ bgm.addEventListener("ended", () => {
   }, 500);
 });
 
-/* 규칙 확인 버튼 */
+/* 규칙 확인 */
 btn.addEventListener("click", () => {
 
-  /* 🔊 BGM 최초 재생 (브라우저 대응) */
+  /* 첫 클릭에서 BGM 재생 */
   if (!bgmStarted) {
     bgm.volume = 0.35;
     bgm.play().catch(()=>{});
     bgmStarted = true;
   }
 
-  /* 규칙 표시 */
   ruleBox.innerText = rules[index];
 
-  /* 이상 현상 연출 */
+  /* 5번 연출 */
   if (index === 4) {
     document.body.classList.add("flash");
     setTimeout(() => {
@@ -159,7 +172,7 @@ btn.addEventListener("click", () => {
     }, 400);
   }
 
-  /* 9번 규칙 → 비명 1회 */
+  /* 9번 비명 (1회) */
   if (index === 8 && !screamPlayed) {
     screamPlayed = true;
     setTimeout(() => {
@@ -175,10 +188,15 @@ btn.addEventListener("click", () => {
     btn.innerText = "탈출 시도";
     btn.onclick = () => {
       ruleBox.innerText =
-        "모든 규칙을 확인했습니다.\n\n하지만 규칙을 읽는 것과\n지키는 것은 다릅니다.";
+        "모든 규칙을 확인했습니다.\n\n하지만 탈출에 성공했는지는\n아직 알 수 없습니다.";
       btn.style.display = "none";
     };
   }
+});
+
+/* 뒤로가기 버튼 */
+document.getElementById("backBtn").addEventListener("click", () => {
+  alert("규칙 위반이 기록되었습니다.");
 });
 
 /* 홈 버튼 */
