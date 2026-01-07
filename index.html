@@ -9,27 +9,44 @@ body {
   margin: 0;
   background: black;
   color: #e0e0e0;
-  font-family: Arial, sans-serif;
+  font-family: serif;
   overflow: hidden;
 }
 
-/* 메인 */
 .container {
   max-width: 700px;
   margin: 100px auto;
   padding: 20px;
-  text-align: center;
+  text-align: left;
+  z-index: 10;
+  position: relative;
 }
 
 button {
   margin-top: 25px;
-  padding: 10px 20px;
-  background: #111;
-  color: white;
-  border: 1px solid #444;
+  padding: 10px 18px;
+  background: black;
+  color: red;
+  border: 1px solid red;
   cursor: pointer;
 }
-button:hover { background:#222; }
+button:hover { background: darkred; }
+
+/* 하단 버튼 */
+#bottomBar {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  z-index: 20;
+}
+.icon {
+  font-size: 26px;
+  color: white;
+  cursor: pointer;
+}
 
 /* 공유 버튼 */
 #shareBtn {
@@ -37,48 +54,29 @@ button:hover { background:#222; }
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 24px;
+  writing-mode: vertical-rl;
   cursor: pointer;
-  z-index: 600;
+  z-index: 20;
 }
 
 /* 광고 */
-#ad {
+.ad {
   position: fixed;
-  top: 30%;
-  right: 60px;
   width: 180px;
-  display: none;
   cursor: pointer;
-  z-index: 500;
+  z-index: 5;
 }
 
-/* 하단 바 */
-#bottomBar {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  z-index: 500;
-}
-.icon {
-  font-size: 26px;
-  cursor: pointer;
-}
-
-/* 오류 */
+/* 오류 박스 */
 .error-box {
   position: fixed;
-  background: rgba(0,0,0,0.95);
   border: 1px solid red;
+  background: rgba(0,0,0,0.9);
   color: red;
   padding: 10px;
-  z-index: 900;
-  min-width: 180px;
+  z-index: 50;
 }
-.error-box .close {
+.close {
   position: absolute;
   top: 3px;
   right: 6px;
@@ -92,15 +90,15 @@ button:hover { background:#222; }
   width: 200px;
   height: 200px;
   background: url("./img/ghost1.png") center/cover no-repeat;
-  z-index: 1200;
+  z-index: 999;
   animation: shake 0.15s infinite;
 }
 
 @keyframes shake {
   0% { transform: translate(0,0); }
-  25% { transform: translate(4px,-4px); }
-  50% { transform: translate(-4px,4px); }
-  75% { transform: translate(4px,4px); }
+  25% { transform: translate(3px,-3px); }
+  50% { transform: translate(-3px,3px); }
+  75% { transform: translate(3px,3px); }
   100% { transform: translate(0,0); }
 }
 </style>
@@ -113,23 +111,17 @@ button:hover { background:#222; }
 <audio id="scream" src="./sound/scream.mp3"></audio>
 <audio id="deathSound" src="./sound/screm 2.mp3"></audio>
 
-<!-- 광고 -->
-<img id="ad" src="./img/advertisement1.png" onclick="die('광고를 클릭했습니다')">
-
-<!-- 공유 버튼 -->
-<div id="shareBtn" onclick="die('공유 버튼을 눌렀습니다')">⤴</div>
+<div id="shareBtn" onclick="intentionalDie()">공유</div>
 
 <div class="container" id="content">
   <h1>판태현 블로그</h1>
   <div id="ruleText"></div>
-  <div id="extra"></div>
-  <button onclick="nextRule()">다음 항목으로 이동</button>
+  <button id="nextBtn">다음 항목으로 이동</button>
 </div>
 
-<!-- 하단 -->
 <div id="bottomBar">
-  <div class="icon" onclick="die('뒤로가기를 시도했습니다')">◀</div>
-  <div class="icon" onclick="die('홈 버튼을 눌렀습니다')">⌂</div>
+  <div class="icon" onclick="warnButton()">◀</div>
+  <div class="icon" onclick="warnButton()">⌂</div>
 </div>
 
 <script>
@@ -141,92 +133,122 @@ const rules = [
  "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
  "6. 거짓된 문장이 있을 수 있습니다.",
  "7. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
- "8. 응시하라는 문장은 존재하지 않습니다. 뒤로가기를 누르십시오.",
+ "8. 응시하라는 문장은 존재하지 않습니다.",
  "9. 광고가 나타나도 누르지 마십시오.",
- "10. 어떤 소리에도 반응하지 마십시오. 이 블로그에는 소리가 나지 않습니다."
+ "10. 어떤 소리에도 반응하지 마십시오."
 ];
 
 let index = 0;
 let dead = false;
+let warned = false;
+
+const ruleText = document.getElementById("ruleText");
+const nextBtn = document.getElementById("nextBtn");
 
 // BGM
 document.body.addEventListener("click", () => {
   document.getElementById("bgm").play();
-},{once:true});
+}, { once: true });
 
 showRule();
 
-function showRule() {
-  ruleText.innerText = rules[index];
-  extra.innerHTML = "";
-
-  if (index === 3) spawnErrors(); // 4번 오류
-  if (index === 6) extra.innerHTML = "<br><button onclick='die(\"공유 버튼을 눌렀습니다\")'>친구에게 공유하기</button>";
-  if (index === 9) scream.play();
-
-  if (Math.random() < 0.6) showAd();
-}
-
-function nextRule() {
+nextBtn.onclick = () => {
   if (dead) return;
   index++;
-  if (index >= rules.length) return die("모든 규칙을 확인했습니다");
+
+  if (index >= rules.length) {
+    escape();
+    return;
+  }
   showRule();
+};
+
+function showRule() {
+  ruleText.innerText = rules[index];
+
+  // 4번 오류 연출
+  if (index === 3) spawnErrors();
+
+  // 랜덤 광고 연출 (즉사 아님)
+  if (Math.random() < 0.25) spawnAd();
+
+  // 10번 소리
+  if (index === 9) document.getElementById("scream").play();
 }
 
-/* 오류 파바박 */
 function spawnErrors() {
-  for (let i=0;i<50;i++) {
-    const e=document.createElement("div");
-    e.className="error-box";
-    e.style.top=Math.random()*90+"%";
-    e.style.left=Math.random()*90+"%";
-    e.innerHTML=`<div class="close">✕</div>오류<br>오류 코드 56424650`;
-    e.querySelector(".close").onclick=()=>e.remove();
+  for (let i = 0; i < 25; i++) {
+    const e = document.createElement("div");
+    e.className = "error-box";
+    e.style.top = Math.random()*90+"%";
+    e.style.left = Math.random()*90+"%";
+    e.innerHTML = `오류<br>CODE 56424650<span class="close">✕</span>`;
+    e.querySelector(".close").onclick = ()=>e.remove();
     document.body.appendChild(e);
   }
 }
 
-/* 광고 */
-function showAd() {
-  ad.style.display="block";
+function spawnAd() {
+  const ad = document.createElement("img");
+  ad.src = "./img/advertisement1.png";
+  ad.className = "ad";
+  ad.style.top = Math.random()*60+"%";
+  ad.style.left = Math.random()*60+"%";
+  ad.onclick = intentionalDie;
+  document.body.appendChild(ad);
 }
 
-/* 랜덤 빨간 화면 */
-setInterval(()=>{
-  if(Math.random()<0.35){
-    document.body.style.background="darkred";
-    setTimeout(()=>{
-      if(!dead) document.body.style.background="black";
-    },400);
+function warnButton() {
+  if (!warned) {
+    warned = true;
+    alert("이 버튼은 규칙에 위배됩니다.");
+  } else {
+    intentionalDie();
   }
-},2000);
+}
 
-/* 사망 */
-function die(reason){
-  if(dead) return;
-  dead=true;
+function intentionalDie() {
+  if (dead) return;
+  dead = true;
 
-  content.innerHTML="<h1>규칙을 어겼습니다</h1><p>당신은 사망하셨습니다.</p>";
+  document.getElementById("content").innerHTML =
+    "<h1>규칙을 어겼습니다</h1><p>당신은 사망하셨습니다.</p>";
 
   setTimeout(()=>{
-    deathSound.play();
-    spawnGhosts();
+    document.getElementById("deathSound").play();
+    for(let i=0;i<30;i++){
+      setTimeout(()=>{
+        const g=document.createElement("div");
+        g.className="ghost";
+        g.style.top=Math.random()*100+"%";
+        g.style.left=Math.random()*100+"%";
+        document.body.appendChild(g);
+      },i*80);
+    }
   },2000);
 }
 
-/* 귀신 파바박 */
-function spawnGhosts(){
-  for(let i=0;i<25;i++){
-    setTimeout(()=>{
-      const g=document.createElement("div");
-      g.className="ghost";
-      g.style.top=Math.random()*100+"%";
-      g.style.left=Math.random()*100+"%";
-      document.body.appendChild(g);
-    },i*120);
-  }
+function escape() {
+  document.getElementById("content").innerHTML =
+    "<h1>저주에서 벗어났습니다</h1><p>당신은 끝까지 규칙을 지켰습니다.</p>";
+
+  // 5초 후 깜빡임
+  setTimeout(()=>{
+    let blink = setInterval(()=>{
+      document.body.style.background =
+        document.body.style.background === "black" ? "darkred" : "black";
+    },200);
+    setTimeout(()=>clearInterval(blink),2000);
+  },5000);
 }
+
+// 빨간 화면 랜덤 연출
+setInterval(()=>{
+  if(!dead && Math.random()<0.35){
+    document.body.style.background="darkred";
+    setTimeout(()=>document.body.style.background="black",300);
+  }
+},1500);
 </script>
 
 </body>
