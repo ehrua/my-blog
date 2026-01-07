@@ -2,18 +2,24 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Video Test</title>
+  <title>Video Force Test</title>
 </head>
-<body>
+<body style="background:black; color:white;">
 
-<video 
-  src="video/advertisement2.mp4"
+<p>영상 테스트</p>
+
+<video
   controls
-  autoplay
   muted
-  loop
-  style="width: 400px;"
-></video>
+  autoplay
+  playsinline
+  preload="auto"
+  width="400">
+
+  <source src="./video/advertisement2.mp4" type="video/mp4">
+  영상이 지원되지 않습니다.
+
+</video>
 
 </body>
 </html>
