@@ -14,12 +14,11 @@ body {
 }
 
 .container {
-  max-width: 700px;
+  max-width: 640px;
   margin: 100px auto;
   padding: 20px;
-  text-align: left;
-  z-index: 10;
   position: relative;
+  z-index: 10;
 }
 
 button {
@@ -32,7 +31,7 @@ button {
 }
 button:hover { background: darkred; }
 
-/* 하단 버튼 */
+/* 하단 바 */
 #bottomBar {
   position: fixed;
   bottom: 10px;
@@ -48,33 +47,49 @@ button:hover { background: darkred; }
   cursor: pointer;
 }
 
-/* 공유 버튼 */
+/* 공유 버튼 (오른쪽) */
 #shareBtn {
   position: fixed;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
+  color: white;
+  border: 1px solid #555;
+  padding: 6px 4px;
+  font-size: 16px;
   cursor: pointer;
-  z-index: 20;
+  z-index: 30;
+  background: rgba(0,0,0,0.6);
+}
+#shareBtn:hover {
+  background: darkred;
 }
 
-/* 광고 */
+/* 광고 (사이드 전용) */
 .ad {
   position: fixed;
-  width: 180px;
-  cursor: pointer;
+  width: 160px;
   z-index: 5;
+  cursor: pointer;
+}
+#adLeft {
+  left: 10px;
+  top: 30%;
+}
+#adRight {
+  right: 60px;
+  top: 35%;
 }
 
 /* 오류 박스 */
 .error-box {
   position: fixed;
-  border: 1px solid red;
   background: rgba(0,0,0,0.9);
+  border: 1px solid red;
   color: red;
   padding: 10px;
-  z-index: 50;
+  z-index: 40;
 }
 .close {
   position: absolute;
@@ -111,7 +126,12 @@ button:hover { background: darkred; }
 <audio id="scream" src="./sound/scream.mp3"></audio>
 <audio id="deathSound" src="./sound/screm2.mp3"></audio>
 
+<!-- 공유 버튼 -->
 <div id="shareBtn" onclick="intentionalDie()">공유</div>
+
+<!-- 광고 (사이드 고정) -->
+<img id="adLeft" class="ad" src="./img/advertisement1.png" onclick="intentionalDie()" style="display:none;">
+<img id="adRight" class="ad" src="./img/advertisement1.png" onclick="intentionalDie()" style="display:none;">
 
 <div class="container" id="content">
   <h1>판태현 블로그</h1>
@@ -155,7 +175,6 @@ showRule();
 nextBtn.onclick = () => {
   if (dead) return;
   index++;
-
   if (index >= rules.length) {
     escape();
     return;
@@ -166,18 +185,18 @@ nextBtn.onclick = () => {
 function showRule() {
   ruleText.innerText = rules[index];
 
-  // 4번 오류 연출
   if (index === 3) spawnErrors();
-
-  // 랜덤 광고 연출 (즉사 아님)
-  if (Math.random() < 0.25) spawnAd();
-
-  // 10번 소리
   if (index === 9) document.getElementById("scream").play();
+
+  // 광고는 낮은 확률 + 사이드만
+  if (Math.random() < 0.25) {
+    document.getElementById("adLeft").style.display = "block";
+    document.getElementById("adRight").style.display = "block";
+  }
 }
 
 function spawnErrors() {
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 20; i++) {
     const e = document.createElement("div");
     e.className = "error-box";
     e.style.top = Math.random()*90+"%";
@@ -186,16 +205,6 @@ function spawnErrors() {
     e.querySelector(".close").onclick = ()=>e.remove();
     document.body.appendChild(e);
   }
-}
-
-function spawnAd() {
-  const ad = document.createElement("img");
-  ad.src = "./img/advertisement1.png";
-  ad.className = "ad";
-  ad.style.top = Math.random()*60+"%";
-  ad.style.left = Math.random()*60+"%";
-  ad.onclick = intentionalDie;
-  document.body.appendChild(ad);
 }
 
 function warnButton() {
@@ -232,7 +241,6 @@ function escape() {
   document.getElementById("content").innerHTML =
     "<h1>저주에서 벗어났습니다</h1><p>당신은 끝까지 규칙을 지켰습니다.</p>";
 
-  // 5초 후 깜빡임
   setTimeout(()=>{
     let blink = setInterval(()=>{
       document.body.style.background =
@@ -242,9 +250,9 @@ function escape() {
   },5000);
 }
 
-// 빨간 화면 랜덤 연출
+// 랜덤 빨간 화면 (연출만)
 setInterval(()=>{
-  if(!dead && Math.random()<0.35){
+  if(!dead && Math.random()<0.3){
     document.body.style.background="darkred";
     setTimeout(()=>document.body.style.background="black",300);
   }
