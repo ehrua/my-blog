@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>이미지 테스트</title>
-</head>
-<body style="background:black; color:white;">
+<html>
+<body>
 
-<h2>이미지 테스트</h2>
+<button onclick="playSound()">소리 테스트</button>
 
-<p>advertisement 1</p>
-<img src="./img/advertisement%201.png" width="300">
+<audio id="test1" src="./sound/bgm.mp3"></audio>
+<audio id="test2" src="./sound/scream.mp3"></audio>
+<audio id="test3" src="./sound/screm%202.mp3"></audio>
 
-<p>ghost1</p>
-<img src="./img/ghost1.png" width="300">
+<script>
+function playSound() {
+  document.getElementById("test1").play();
+  document.getElementById("test2").play();
+  document.getElementById("test3").play();
+}
+</script>
 
 </body>
 </html>
