@@ -8,41 +8,76 @@
 body {
   margin: 0;
   background: black;
-  color: white;
-  font-family: serif;
+  color: #e0e0e0;
+  font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
-#container {
-  width: 60%;
+/* 메인 */
+.container {
+  max-width: 700px;
   margin: 100px auto;
-  text-align: left;
+  padding: 20px;
+  text-align: center;
 }
 
 button {
-  margin-top: 20px;
-  padding: 8px 14px;
-  background: black;
-  color: red;
-  border: 1px solid red;
+  margin-top: 25px;
+  padding: 10px 20px;
+  background: #111;
+  color: white;
+  border: 1px solid #444;
+  cursor: pointer;
+}
+button:hover { background:#222; }
+
+/* 공유 버튼 */
+#shareBtn {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 600;
+}
+
+/* 광고 */
+#ad {
+  position: fixed;
+  top: 30%;
+  right: 60px;
+  width: 180px;
+  display: none;
+  cursor: pointer;
+  z-index: 500;
+}
+
+/* 하단 바 */
+#bottomBar {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  z-index: 500;
+}
+.icon {
+  font-size: 26px;
   cursor: pointer;
 }
 
-button:hover {
-  background: darkred;
-}
-
-/* 오류 박스 */
+/* 오류 */
 .error-box {
   position: fixed;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0,0,0,0.95);
   border: 1px solid red;
   color: red;
   padding: 10px;
-  z-index: 999;
+  z-index: 900;
   min-width: 180px;
 }
-
 .error-box .close {
   position: absolute;
   top: 3px;
@@ -51,167 +86,147 @@ button:hover {
   color: white;
 }
 
-/* 광고 */
-.ad {
+/* 귀신 */
+.ghost {
   position: fixed;
-  top: 20%;
-  right: 20px;
-  width: 180px;
-  cursor: pointer;
-  z-index: 800;
-}
-
-/* 사망 이펙트 */
-.death {
-  position: fixed;
-  font-size: 26px;
+  width: 200px;
+  height: 200px;
+  background: url("./img/ghost1.png") center/cover no-repeat;
   z-index: 1200;
   animation: shake 0.15s infinite;
 }
 
 @keyframes shake {
   0% { transform: translate(0,0); }
-  25% { transform: translate(3px,-3px); }
-  50% { transform: translate(-3px,3px); }
-  75% { transform: translate(3px,3px); }
+  25% { transform: translate(4px,-4px); }
+  50% { transform: translate(-4px,4px); }
+  75% { transform: translate(4px,4px); }
   100% { transform: translate(0,0); }
-}
-
-/* 공유 버튼 */
-#shareBtn {
-  position: fixed;
-  top: 50%;
-  right: 10px;
-  writing-mode: vertical-rl;
 }
 </style>
 </head>
 
 <body>
 
-<div id="container">
-  <div id="rule"></div>
-  <button id="nextBtn">다음 항목으로 이동</button>
+<!-- 오디오 -->
+<audio id="bgm" src="./sound/bgm.mp3" loop></audio>
+<audio id="scream" src="./sound/scream.mp3"></audio>
+<audio id="deathSound" src="./sound/screm 2.mp3"></audio>
+
+<!-- 광고 -->
+<img id="ad" src="./img/advertisement1.png" onclick="die('광고를 클릭했습니다')">
+
+<!-- 공유 버튼 -->
+<div id="shareBtn" onclick="die('공유 버튼을 눌렀습니다')">⤴</div>
+
+<div class="container" id="content">
+  <h1>판태현 블로그</h1>
+  <div id="ruleText"></div>
+  <div id="extra"></div>
+  <button onclick="nextRule()">다음 항목으로 이동</button>
 </div>
 
-<button id="shareBtn">공유하기</button>
-
-<audio id="screamSound" src="screm2.mp3"></audio>
+<!-- 하단 -->
+<div id="bottomBar">
+  <div class="icon" onclick="die('뒤로가기를 시도했습니다')">◀</div>
+  <div class="icon" onclick="die('홈 버튼을 눌렀습니다')">⌂</div>
+</div>
 
 <script>
 const rules = [
-  "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
-  "2. 이 블로그에 접속한 사실과 링크를 외부에 남기지 마십시오.",
-  "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.",
-  "4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.",
-  "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
-  "6. 거짓된 문장이 있을 수 있습니다.",
-  "7. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
-  "8. 규칙 중 '어딘가를 응시하라'는 문장은 없습니다. 뒤로가기를 누르십시오.",
-  "9. 글 중간에 광고가 나타날 수 있습니다. 누르지 마십시오.",
-  "10. 어떤 소리에도 반응하지 마십시오. 이 블로그에는 소리가 나지 않습니다."
+ "1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.",
+ "2. 이 블로그에 접속한 사실과 링크를 외부에 남기지 마십시오.",
+ "3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.",
+ "4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.",
+ "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
+ "6. 거짓된 문장이 있을 수 있습니다.",
+ "7. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
+ "8. 응시하라는 문장은 존재하지 않습니다. 뒤로가기를 누르십시오.",
+ "9. 광고가 나타나도 누르지 마십시오.",
+ "10. 어떤 소리에도 반응하지 마십시오. 이 블로그에는 소리가 나지 않습니다."
 ];
 
 let index = 0;
 let dead = false;
 
-const ruleDiv = document.getElementById("rule");
-const nextBtn = document.getElementById("nextBtn");
+// BGM
+document.body.addEventListener("click", () => {
+  document.getElementById("bgm").play();
+},{once:true});
 
-ruleDiv.innerText = rules[index];
+showRule();
 
-nextBtn.onclick = () => {
+function showRule() {
+  ruleText.innerText = rules[index];
+  extra.innerHTML = "";
+
+  if (index === 3) spawnErrors(); // 4번 오류
+  if (index === 6) extra.innerHTML = "<br><button onclick='die(\"공유 버튼을 눌렀습니다\")'>친구에게 공유하기</button>";
+  if (index === 9) scream.play();
+
+  if (Math.random() < 0.6) showAd();
+}
+
+function nextRule() {
   if (dead) return;
-
   index++;
+  if (index >= rules.length) return die("모든 규칙을 확인했습니다");
+  showRule();
+}
 
-  if (index >= rules.length) {
-    kill("모든 규칙을 확인했습니다.");
-    return;
-  }
-
-  ruleDiv.innerText = rules[index];
-
-  if (index === 3) spawnErrorFlood(); // 4번
-  if (Math.random() < 0.5) showAd();
-};
-
-// 오류 파바박
-function spawnErrorFlood(count = 40) {
-  for (let i = 0; i < count; i++) {
-    const box = document.createElement("div");
-    box.className = "error-box";
-    box.style.top = Math.random() * 90 + "%";
-    box.style.left = Math.random() * 90 + "%";
-    box.innerHTML = `
-      <div class="close">✕</div>
-      오류<br>오류 코드 56424650
-    `;
-    box.querySelector(".close").onclick = () => box.remove();
-    document.body.appendChild(box);
+/* 오류 파바박 */
+function spawnErrors() {
+  for (let i=0;i<50;i++) {
+    const e=document.createElement("div");
+    e.className="error-box";
+    e.style.top=Math.random()*90+"%";
+    e.style.left=Math.random()*90+"%";
+    e.innerHTML=`<div class="close">✕</div>오류<br>오류 코드 56424650`;
+    e.querySelector(".close").onclick=()=>e.remove();
+    document.body.appendChild(e);
   }
 }
 
-// 광고
+/* 광고 */
 function showAd() {
-  const ad = document.createElement("img");
-  ad.src = "advertisement1.png";
-  ad.className = "ad";
-  ad.onclick = () => kill("광고를 클릭했습니다.");
-  document.body.appendChild(ad);
+  ad.style.display="block";
 }
 
-// 사망 처리
-function kill(reason) {
-  if (dead) return;
-  dead = true;
+/* 랜덤 빨간 화면 */
+setInterval(()=>{
+  if(Math.random()<0.35){
+    document.body.style.background="darkred";
+    setTimeout(()=>{
+      if(!dead) document.body.style.background="black";
+    },400);
+  }
+},2000);
 
-  document.body.style.background = "darkred";
-  ruleDiv.innerText = "규칙을 어겼습니다.\n당신은 사망하셨습니다.";
+/* 사망 */
+function die(reason){
+  if(dead) return;
+  dead=true;
 
-  document.getElementById("screamSound").play();
+  content.innerHTML="<h1>규칙을 어겼습니다</h1><p>당신은 사망하셨습니다.</p>";
 
-  setTimeout(() => {
-    const ghost = document.createElement("img");
-    ghost.src = "ghost1.png";
-    ghost.style.position = "fixed";
-    ghost.style.top = "50%";
-    ghost.style.left = "50%";
-    ghost.style.transform = "translate(-50%,-50%)";
-    ghost.style.zIndex = "1500";
-    document.body.appendChild(ghost);
-
-    spawnDeathFlood();
-  }, 2000);
+  setTimeout(()=>{
+    deathSound.play();
+    spawnGhosts();
+  },2000);
 }
 
-// 사망 파바박
-function spawnDeathFlood() {
-  for (let i = 0; i < 60; i++) {
-    const d = document.createElement("div");
-    d.className = "death";
-    d.style.top = Math.random() * 100 + "%";
-    d.style.left = Math.random() * 100 + "%";
-    d.innerHTML = `👁️‍🗨️ <span class="close">✕</span>`;
-    d.querySelector(".close").onclick = () => d.remove();
-    document.body.appendChild(d);
+/* 귀신 파바박 */
+function spawnGhosts(){
+  for(let i=0;i<25;i++){
+    setTimeout(()=>{
+      const g=document.createElement("div");
+      g.className="ghost";
+      g.style.top=Math.random()*100+"%";
+      g.style.left=Math.random()*100+"%";
+      document.body.appendChild(g);
+    },i*120);
   }
 }
-
-// 빨간 화면 랜덤
-setInterval(() => {
-  if (Math.random() < 0.4) {
-    document.body.style.background = "darkred";
-    setTimeout(() => {
-      if (!dead) document.body.style.background = "black";
-    }, 300);
-  }
-}, 1500);
-
-// 공유 버튼 누르면 사망
-document.getElementById("shareBtn").onclick = () => {
-  kill("공유 버튼을 눌렀습니다.");
-};
 </script>
 
 </body>
