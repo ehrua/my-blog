@@ -32,11 +32,22 @@ button:hover {
   background: #222;
 }
 
+/* 오른쪽 공유 버튼 */
+#shareBtn {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
 /* 광고 */
 #ad {
   position: fixed;
   top: 30%;
-  right: 20px;
+  right: 60px;
   width: 180px;
   display: none;
   cursor: pointer;
@@ -80,10 +91,14 @@ button:hover {
 <!-- 광고 -->
 <img id="ad" src="./img/advertisement1.png" onclick="die()">
 
+<!-- 오른쪽 공유 버튼 -->
+<div id="shareBtn" onclick="die()">⤴</div>
+
 <div class="container" id="content">
   <h1>판태현 블로그</h1>
   <div id="ruleText"></div>
-  <button id="nextBtn" onclick="nextRule()">다음 항목 확인</button>
+  <div id="extra"></div>
+  <button id="nextBtn" onclick="nextRule()">다음 항목으로 이동</button>
 </div>
 
 <div id="bottomBar">
@@ -99,7 +114,7 @@ const rules = [
   "4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.",
   "5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.",
   "6. 거짓된 문장이 있을 수 있습니다.",
-  "7. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
+  "7. 당신이 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.",
   "8. 응시하라는 문장은 존재하지 않습니다. 뒤로가기를 누르십시오.",
   "9. 광고가 나타나도 누르지 마십시오.",
   "10. 어떤 소리에도 반응하지 마십시오."
@@ -108,37 +123,38 @@ const rules = [
 let index = 0;
 let dead = false;
 
-// BGM (첫 클릭 필요)
+// BGM
 document.body.addEventListener("click", () => {
   document.getElementById("bgm").play();
 }, { once: true });
 
-// 초기 규칙 표시
-document.getElementById("ruleText").innerText = rules[index];
+showRule();
 
-// 다음 규칙
-function nextRule() {
-  if (dead) return;
+function showRule() {
+  document.getElementById("ruleText").innerText = rules[index];
+  document.getElementById("extra").innerHTML = "";
 
-  index++;
-
-  // 7번 공유 → 사망 유도
+  // 7번 항목일 때만 공유 버튼 노출
   if (index === 6) {
-    die();
-    return;
+    document.getElementById("extra").innerHTML =
+      "<br><button onclick='die()'>친구에게 공유하기</button>";
   }
 
-  // 10번 소리
+  // 10번 항목 소리
   if (index === 9) {
     document.getElementById("scream").play();
   }
+}
+
+function nextRule() {
+  if (dead) return;
+  index++;
 
   if (index >= rules.length) {
     escape();
     return;
   }
-
-  document.getElementById("ruleText").innerText = rules[index];
+  showRule();
 }
 
 // 랜덤 빨간 화면
