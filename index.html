@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Test</title>
+</head>
 <body>
 
-<button onclick="test()">사운드 테스트</button>
-
-<audio id="t" src="./sound/screm2.mp3"></audio>
-
-<script>
-function test() {
-  document.getElementById("t").play();
-}
-</script>
+<video 
+  src="video/advertisement2.mp4"
+  controls
+  autoplay
+  muted
+  loop
+  style="width: 400px;"
+></video>
 
 </body>
 </html>
