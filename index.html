@@ -9,28 +9,27 @@ body {
   margin: 0;
   background: black;
   color: #e0e0e0;
-  font-family: "Malgun Gothic", sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 .container {
-  max-width: 700px;
-  margin: 80px auto;
+  max-width: 720px;
+  margin: 60px auto;
   padding: 20px;
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 40px;
 }
 
 .rule {
   border-bottom: 1px solid #333;
   padding: 15px;
-  cursor: pointer;
+  margin-bottom: 10px;
 }
 
-.rule.checked {
-  color: #777;
+.rule button {
+  margin-top: 10px;
 }
 
 #bottomBar {
@@ -48,129 +47,164 @@ h1 {
   color: white;
 }
 
-/* 광고 이미지 */
-#adImage {
+/* 광고 */
+#ad {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
+  top: 30%;
+  right: 20px;
+  width: 200px;
   display: none;
-  z-index: 999;
+  cursor: pointer;
+  z-index: 500;
 }
 
-/* 귀신 이미지 */
+/* 귀신 */
 #ghost {
   position: fixed;
   inset: 0;
   background: url("./img/ghost1.png") center/cover no-repeat;
   display: none;
-  z-index: 1000;
+  z-index: 999;
 }
 
 /* 엔딩 */
 #ending {
   display: none;
   text-align: center;
-  font-size: 22px;
-  margin-top: 100px;
+  font-size: 24px;
+  margin-top: 120px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- 오디오 -->
 <audio id="bgm" src="./sound/bgm.mp3" loop></audio>
 <audio id="scream" src="./sound/scream.mp3"></audio>
-<audio id="deathSound" src="./sound/screm 2.mp3"></audio>
+<audio id="deathSound" src="./sound/screm2.mp3"></audio>
 
-<img id="adImage" src="./img/advertisement 1.png">
+<!-- 광고 -->
+<img id="ad" src="./img/advertisement1.png" onclick="die()">
+
+<!-- 귀신 -->
 <div id="ghost"></div>
 
 <div class="container" id="content">
   <h1>판태현 블로그</h1>
 
-  <div class="rule" onclick="checkRule(1)">1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.</div>
-  <div class="rule" onclick="checkRule(2)">2. 이 블로그에 접속한 사실을 외부에 남기지 마십시오.</div>
-  <div class="rule" onclick="checkRule(3)">3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.</div>
-  <div class="rule" onclick="checkRule(4)">4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.</div>
-  <div class="rule" onclick="checkRule(5)">5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.</div>
-  <div class="rule" onclick="checkRule(6)">6. 이 규칙은 기록됩니다.</div>
-  <div class="rule" onclick="checkRule(7)">7. 응시하라는 문장은 존재하지 않습니다.</div>
-  <div class="rule" onclick="checkRule(8)">8. 항목이 수정되었습니다.</div>
-  <div class="rule" onclick="checkRule(9)">9. 어떤 소리가 들려도 반응하지 마십시오.</div>
+  <div class="rule">1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">2. 이 블로그에 접속한 사실과 링크를 외부에 남기지 마십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">6. 거짓된 문장이 있을 수 있습니다.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">7. 저주에서 벗어나고 싶다면 3명에게 링크를 공유하십시오.
+    <br><button onclick="die()">친구에게 공유하기</button>
+  </div>
+
+  <div class="rule">8. “응시하십시오” 같은 문장은 없습니다. 뒤로가기를 누르십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">9. 글 중간에 광고가 나타나도 누르지 마십시오.
+    <br><button onclick="check()">확인</button>
+  </div>
+
+  <div class="rule">10. 어떤 소리에도 반응하지 마십시오.
+    <br><button onclick="checkSound()">확인</button>
+  </div>
 </div>
 
 <div id="ending"></div>
 
 <div id="bottomBar">
-  <div class="icon" onclick="goBack()">◀</div>
-  <div class="icon" onclick="goHome()">⌂</div>
+  <div class="icon" onclick="die()">◀</div>
+  <div class="icon">⌂</div>
 </div>
 
 <script>
-let checked = 0;
 let dead = false;
 
+// BGM 시작 (사용자 상호작용 필요)
 document.body.addEventListener("click", () => {
   document.getElementById("bgm").play();
 }, { once: true });
 
-function checkRule(n) {
-  if (dead) return;
-
-  event.target.classList.add("checked");
-  checked++;
-
-  if (n === 7) {
-    triggerDeath();
-  }
-
-  if (n === 9) {
+// 랜덤 빨간 화면
+setInterval(() => {
+  if (Math.random() < 0.15) {
+    document.body.style.background = "darkred";
     setTimeout(() => {
-      document.getElementById("scream").play();
-    }, 1000);
+      document.body.style.background = "black";
+    }, 700);
   }
+}, 4000);
 
-  if (checked >= 9 && !dead) {
-    escapeEnding();
-  }
+// 랜덤 광고
+setTimeout(() => {
+  document.getElementById("ad").style.display = "block";
+}, 6000);
+
+// 규칙 확인
+function check() {
+  event.target.disabled = true;
 }
 
-function goBack() {
-  triggerDeath();
+// 10번 항목 소리
+function checkSound() {
+  document.getElementById("scream").play();
 }
 
-function goHome() {
-  // 아무 일도 일어나지 않음 (심리적 연출)
-}
-
-function triggerDeath() {
+// 사망 처리
+function die() {
   if (dead) return;
   dead = true;
 
-  setTimeout(() => {
-    document.getElementById("adImage").style.display = "block";
-    document.getElementById("deathSound").play();
-  }, 1000);
-
-  setTimeout(() => {
-    document.getElementById("ghost").style.display = "block";
-  }, 1500);
-
-  setTimeout(() => {
-    document.getElementById("content").style.display = "none";
-    document.getElementById("ending").style.display = "block";
-    document.getElementById("ending").innerText =
-      "당신은 저주를 받았습니다.\n3일 이내에 사망합니다.";
-  }, 3000);
-}
-
-function escapeEnding() {
   document.getElementById("content").style.display = "none";
   document.getElementById("ending").style.display = "block";
   document.getElementById("ending").innerText =
-    "당신은 규칙을 어기지 않았습니다.\n저주에서 해방되었습니다.";
+    "규칙을 어겼습니다.\n당신은 사망하셨습니다.";
+
+  setTimeout(() => {
+    document.getElementById("deathSound").play();
+    spawnGhosts();
+  }, 2000);
+}
+
+// 귀신 파바박
+function spawnGhosts() {
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      let g = document.createElement("div");
+      g.style.position = "fixed";
+      g.style.top = Math.random() * 100 + "%";
+      g.style.left = Math.random() * 100 + "%";
+      g.style.width = "200px";
+      g.style.height = "200px";
+      g.style.background = "url('./img/ghost1.png') center/cover no-repeat";
+      g.style.zIndex = 1000;
+      document.body.appendChild(g);
+    }, i * 200);
+  }
 }
 </script>
 
