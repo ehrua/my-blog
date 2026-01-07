@@ -1,25 +1,178 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Video Test</title>
+<meta charset="UTF-8">
+<title>판태현 블로그</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: #e0e0e0;
+  font-family: "Malgun Gothic", sans-serif;
+}
+
+.container {
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.rule {
+  border-bottom: 1px solid #333;
+  padding: 15px;
+  cursor: pointer;
+}
+
+.rule.checked {
+  color: #777;
+}
+
+#bottomBar {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.icon {
+  font-size: 26px;
+  cursor: pointer;
+  color: white;
+}
+
+/* 광고 이미지 */
+#adImage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  display: none;
+  z-index: 999;
+}
+
+/* 귀신 이미지 */
+#ghost {
+  position: fixed;
+  inset: 0;
+  background: url("./img/ghost1.png") center/cover no-repeat;
+  display: none;
+  z-index: 1000;
+}
+
+/* 엔딩 */
+#ending {
+  display: none;
+  text-align: center;
+  font-size: 22px;
+  margin-top: 100px;
+}
+</style>
 </head>
-<body style="background:black; color:white;">
 
-<h2>영상 테스트</h2>
+<body>
 
-<video
-  width="600"
-  controls
-  autoplay
-  muted
-  playsinline
-  preload="auto">
+<audio id="bgm" src="./sound/bgm.mp3" loop></audio>
+<audio id="scream" src="./sound/scream.mp3"></audio>
+<audio id="deathSound" src="./sound/screm 2.mp3"></audio>
 
-  <source src="./video/advertisement2.mp4" type="video/mp4">
-  영상이 지원되지 않습니다.
+<img id="adImage" src="./img/advertisement 1.png">
+<div id="ghost"></div>
 
-</video>
+<div class="container" id="content">
+  <h1>판태현 블로그</h1>
+
+  <div class="rule" onclick="checkRule(1)">1. 이 글을 읽는 동안 뒤로 가기 버튼을 누르지 마십시오.</div>
+  <div class="rule" onclick="checkRule(2)">2. 이 블로그에 접속한 사실을 외부에 남기지 마십시오.</div>
+  <div class="rule" onclick="checkRule(3)">3. 화면에 비친 자신의 얼굴을 5초 이상 바라보지 마십시오.</div>
+  <div class="rule" onclick="checkRule(4)">4. 오류나 빈 화면이 나타나도 새로 고침을 하지 마십시오.</div>
+  <div class="rule" onclick="checkRule(5)">5. 화면이 빨간색으로 변하면 오른쪽으로 고개를 돌리십시오.</div>
+  <div class="rule" onclick="checkRule(6)">6. 이 규칙은 기록됩니다.</div>
+  <div class="rule" onclick="checkRule(7)">7. 응시하라는 문장은 존재하지 않습니다.</div>
+  <div class="rule" onclick="checkRule(8)">8. 항목이 수정되었습니다.</div>
+  <div class="rule" onclick="checkRule(9)">9. 어떤 소리가 들려도 반응하지 마십시오.</div>
+</div>
+
+<div id="ending"></div>
+
+<div id="bottomBar">
+  <div class="icon" onclick="goBack()">◀</div>
+  <div class="icon" onclick="goHome()">⌂</div>
+</div>
+
+<script>
+let checked = 0;
+let dead = false;
+
+document.body.addEventListener("click", () => {
+  document.getElementById("bgm").play();
+}, { once: true });
+
+function checkRule(n) {
+  if (dead) return;
+
+  event.target.classList.add("checked");
+  checked++;
+
+  if (n === 7) {
+    triggerDeath();
+  }
+
+  if (n === 9) {
+    setTimeout(() => {
+      document.getElementById("scream").play();
+    }, 1000);
+  }
+
+  if (checked >= 9 && !dead) {
+    escapeEnding();
+  }
+}
+
+function goBack() {
+  triggerDeath();
+}
+
+function goHome() {
+  // 아무 일도 일어나지 않음 (심리적 연출)
+}
+
+function triggerDeath() {
+  if (dead) return;
+  dead = true;
+
+  setTimeout(() => {
+    document.getElementById("adImage").style.display = "block";
+    document.getElementById("deathSound").play();
+  }, 1000);
+
+  setTimeout(() => {
+    document.getElementById("ghost").style.display = "block";
+  }, 1500);
+
+  setTimeout(() => {
+    document.getElementById("content").style.display = "none";
+    document.getElementById("ending").style.display = "block";
+    document.getElementById("ending").innerText =
+      "당신은 저주를 받았습니다.\n3일 이내에 사망합니다.";
+  }, 3000);
+}
+
+function escapeEnding() {
+  document.getElementById("content").style.display = "none";
+  document.getElementById("ending").style.display = "block";
+  document.getElementById("ending").innerText =
+    "당신은 규칙을 어기지 않았습니다.\n저주에서 해방되었습니다.";
+}
+</script>
 
 </body>
 </html>
